@@ -1,0 +1,9 @@
+# Core requirements for using this application
+-c constraints.txt
+
+Django             # Web application framework
+djangorestframework
+edx-django-utils
+edx-drf-extensions
+edx-opaque-keys[django]
+edx-toggles
