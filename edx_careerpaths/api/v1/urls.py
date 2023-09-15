@@ -11,6 +11,6 @@ urlpatterns = [
     path('careerpaths', views.CareerPathInfoAPIView.as_view(), name='careerpaths'),
     path('levels', views.LevelAPIView.as_view(), name="levels"),
     path('pathcourses', views.CareerPathCourseAPIView.as_view(), name="Path Courses"),
-    # path('careerpaths/<int:pk>', views.getcareerpaths)
+    path('careerpaths/<int:pk>', views.getcareerpaths)
     # path('home', views.gethomeapi())
 ]

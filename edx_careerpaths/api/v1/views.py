@@ -73,15 +73,37 @@ class CareerPathInfoAPIView(APIView):
                 response["name"] = careerpath.name
                 response["description"] = careerpath.description
                 pathcourses = PathCourse.objects.filter(careerpath_id=careerpath_id)
-                courses = []
+                levels = []
+                courses = {}
                 for course in pathcourses:
                     result_course = {}
                     result_course["id"] = course.id
+                    key = CourseKey.from_string(course.course_id)
+                    course_image = get_course_image(key)
+                    id = course.course_id.split(":")[1]
+                    result_course["image_url"] = f"asset-v1:{id}+type@asset+block@{course_image}"
                     result_course["course_id"] = course.course_id
-                    result_course["course_name"] = course.course_name
+                    result_course["name"] = course.course_name
                     result_course["level_name"] = course.level_name
-                    courses.append(result_course)
-                response["courses"] = courses
+                    if course.level_name not in courses:
+                        courses[course.level_name] = [result_course]
+                    else:
+                        courses[course.level_name].append(result_course)
+
+                for key, value in courses.items():
+                    level_orders = {
+                        "Beginner": 1,
+                        "Intermediate": 2,
+                        "Advanced": 3
+                    }
+                    level_dict = {
+                        "level": key,
+                        "level_order": level_orders[key],
+                        "courses": value
+                    }
+                    levels.append(level_dict)
+                sorted_levels = sorted(levels, key=lambda x: x['level_order'])
+                response["level_courses"] = sorted_levels
             except CareerPath.DoesNotExist:
                 response["error"] = "This career path not found."
             finally:
@@ -140,8 +162,9 @@ class LevelAPIView(APIView):
     def get(self, request):
         response = {}
         levels = Level.objects.all()
-        results = [{"id": level.id, "name": level.name} for level in levels]
-        response["levels"] = results
+        levels = [{"id": level.id, "name": level.name} for level in levels]
+        sorted_levels = sorted(levels, key=lambda x: x['id'])
+        response["levels"] = sorted_levels
         return Response(response)
     
     def post(self, request):
@@ -254,33 +277,33 @@ class CareerPathCourseAPIView(APIView):
             }, status=status.HTTP_400_BAD_REQUEST)
         return Response(response, status=status.HTTP_200_OK)
 
-# @api_view(["GET"])
-# def getcareerpaths(request, pk):
-#     if request.method == "GET":
-#         if pk:
-#             result = {}
-#             careerpath_info = CareerPath.objects.get(id=pk)
-#             result["name"] = careerpath_info.name
-#             result["description"] = careerpath_info.description
-#             pathcourses = PathCourse.objects.filter(careerpath_id=pk)
-#             courses = {}
-#             for course in pathcourses:
-#                 result_course = {}
-#                 result_course["id"] = course.id
-#                 key = CourseKey.from_string(course.course_id)
-#                 course_image = get_course_image(key)
-#                 id = course.course_id.split(":")[1]
-#                 result_course["image_url"] = f"asset-v1:{id}+type@asset+block@{course_image}"
-#                 result_course["course_id"] = course.course_id
-#                 result_course["course_name"] = course.course_name
-#                 result_course["level_name"] = course.level_name
-#                 if course.level_name not in courses:
-#                     courses[course.level_name] = [result_course]
-#                 else:
-#                     courses[course.level_name].append(result_course)
+@api_view(["GET"])
+def getcareerpaths(request, pk):
+    if request.method == "GET":
+        if pk:
+            result = {}
+            careerpath_info = CareerPath.objects.get(id=pk)
+            result["name"] = careerpath_info.name
+            result["description"] = careerpath_info.description
+            pathcourses = PathCourse.objects.filter(careerpath_id=pk)
+            courses = {}
+            for course in pathcourses:
+                result_course = {}
+                result_course["id"] = course.id
+                key = CourseKey.from_string(course.course_id)
+                course_image = get_course_image(key)
+                id = course.course_id.split(":")[1]
+                result_course["image_url"] = f"asset-v1:{id}+type@asset+block@{course_image}"
+                result_course["course_id"] = course.course_id
+                result_course["course_name"] = course.course_name
+                result_course["level_name"] = course.level_name
+                if course.level_name not in courses:
+                    courses[course.level_name] = [result_course]
+                else:
+                    courses[course.level_name].append(result_course)
                     
-#             result["courses"] = courses
-#             return Response(result, status=status.HTTP_200_OK)
-#         else:
-#             return Response({"detail": "Please choose a career path id."}, status=status.HTTP_200_OK)
-#     return Response({"message": "You are in right track."})
+            result["courses"] = courses
+            return Response(result, status=status.HTTP_200_OK)
+        else:
+            return Response({"detail": "Please choose a career path id."}, status=status.HTTP_200_OK)
+    return Response({"message": "You are in right track."})

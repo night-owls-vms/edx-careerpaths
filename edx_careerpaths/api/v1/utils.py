@@ -20,7 +20,7 @@ from django.urls.exceptions import NoReverseMatch
 
 # open edx stuff
 from opaque_keys.edx.keys import CourseKey
-from common.djangoapps.util.date_utils import get_default_time_display
+# from common.djangoapps.util.date_utils import get_default_time_display
 
 try:
     # for olive and later
