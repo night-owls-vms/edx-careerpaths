@@ -7,6 +7,10 @@ from edx_django_utils.plugins.constants import (
     PluginURLs, PluginSettings, PluginContexts, PluginSignals
 )
 
+# Signals (aka receivers) defined in https://github.com/openedx/openedx-events/blob/main/openedx_events/learning/signals.py
+CERTIFICATE_CREATED = "CERTIFICATE_CREATED"
+
+OPENEDX_SIGNALS_PATH = "openedx_events.learning.signals"
 
 class EdxCareerpathsConfig(AppConfig):
     """
@@ -66,8 +70,18 @@ class EdxCareerpathsConfig(AppConfig):
             }
         },
 
-        # # Configuration setting for Plugin Signals for this app.
+        # Configuration setting for Plugin Signals for this app.
         # PluginSignals.CONFIG: {
+        #     'lms.djangoapp': {
+        #         PluginSignals.RELATIVE_PATH: 'signals',
+        #         PluginSignals.RECEIVERS: [
+        #             {
+        #                 PluginSignals.RECEIVER_FUNC_NAME: CERTIFICATE_CREATED.lower(),
+        #                 PluginSignals.SIGNAL_PATH: OPENEDX_SIGNALS_PATH + "." + CERTIFICATE_CREATED,
+        #             }
+        #         ]
+        #     }
+        # }
 
         #     # Configure the Plugin Signals for each Project Type, as needed.
         #     'lms.djangoapp': {
