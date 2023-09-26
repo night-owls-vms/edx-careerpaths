@@ -110,7 +110,7 @@ class CareerPathInfoAPIView(APIView):
                 return Response(response, status=status.HTTP_200_OK)
         
         careerpaths = CareerPath.objects.all()
-        results = [{"id": careerpath.id, "name": careerpath.name, "description":careerpath.description} for careerpath in careerpaths]
+        results = [{"id": careerpath.id, "name": careerpath.name, "description":careerpath.description, "courses_count": careerpath.courses_count} for careerpath in careerpaths]
         response["careerpaths"] = results
         return Response(response)
     

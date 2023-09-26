@@ -91,6 +91,10 @@ class CareerPath(models.Model):
     @property
     def get_name(self):
         return "%s"%(str(self.name))
+    
+    @property
+    def courses_count(self):
+        return PathCourse.objects.filter(careerpath=self.id).count()
 
     
 class Level(models.Model):
